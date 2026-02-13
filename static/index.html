@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Письмо для тебя</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body class="night">
+
+  <!-- BACKGROUND: floating hearts (behind everything) -->
+  <canvas id="heartsBg" style="pointer-events:none"></canvas>
+
+  <!-- Stars (behind everything) -->
+  <canvas id="stars" style="pointer-events:none"></canvas>
+
+  <!-- Confetti/FX -->
+  <canvas id="fx" style="pointer-events:none"></canvas>
+
+  <!-- Breath / pause overlay -->
+  <div class="breathOverlay hidden" id="breathOverlay" aria-hidden="true">
+    <div class="breathText">…</div>
+  </div>
+
+  <!-- Quiet overlay (for "тишина") -->
+  <div class="quietOverlay hidden" id="quietOverlay" aria-hidden="true">
+    <div class="quietCard">
+      <div class="quietTitle">🕯 Тишина</div>
+      <div class="quietSub">Просто побудь здесь пару секунд…</div>
+      <div class="quietHint">Нажми в любое место, чтобы вернуться</div>
+    </div>
+  </div>
+
+  <!-- MUSIC -->
+  <button class="musicBtn" id="musicBtn" aria-label="music">
+    <span class="musicDot"></span>
+    <span class="musicText">
+      <span id="musicLabel">включить нашу музыку</span>
+      <span class="musicWave" aria-hidden="true">
+        <span class="bar b1"></span>
+        <span class="bar b2"></span>
+        <span class="bar b3"></span>
+        <span class="bar b4"></span>
+      </span>
+    </span>
+  </button>
+  <audio id="music" preload="auto" src="/static/audio/love.mp3"></audio>
+
+  <!-- MINI CONTROLS (optional buttons for wow) -->
+  <div class="topControls">
+    <button class="chip" id="quietBtn" type="button">🕯 Тишина</button>
+  </div>
+
+  <main class="stage">
+    <!-- ENVELOPE -->
+    <section class="scene scene-envelope active" id="sceneEnvelope">
+      <div class="hintTop">💌 Для тебя. Только для твоих глаз.</div>
+
+      <div class="envelopeWrap">
+        <div class="envelope" id="envelope">
+          <div class="envBack"></div>
+          <div class="envFront"></div>
+
+          <!-- важно: touch-action none чтобы drag всегда работал -->
+          <div class="seal" id="seal" style="touch-action:none">
+            <div class="sealText">веди<br>вправо</div>
+          </div>
+
+          <div class="flap"></div>
+
+          <div class="paperPeek">
+            <div class="paperEdge"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hintBottom">Проведи по печати вправо →</div>
+    </section>
+
+    <!-- LETTER -->
+    <section class="scene scene-letter" id="sceneLetter">
+      <div class="letterWrap">
+        <div class="letter" id="letter">
+
+          <div class="letterHeader">
+            <button class="stamp" id="stampBtn">💘 14 февраля</button>
+            <div class="title">Письмо</div>
+          </div>
+
+          <div class="letterBody">
+            <p class="line">Привет, <span id="name">❤️</span>Жопа</p>
+            <p class="subline">Это письмо раскрывается по кусочкам.</p>
+
+            <div class="tapToContinue" id="tapToContinue">
+              Нажимай на письмо, чтобы читать дальше ✨
+            </div>
+
+            <div class="story" id="story"></div>
+
+            <!-- SCRATCH -->
+            <div class="scratchBlock hidden" id="scratchBlock">
+              <div class="scratchTitle">Тут есть строка, которую видно только тебе…</div>
+              <div class="scratchWrap">
+                <div class="scratchHidden" id="scratchHidden"></div>
+                <canvas class="scratchCanvas" id="scratchCanvas"></canvas>
+              </div>
+              <div class="scratchHint">Проведи пальцем по туману ✨</div>
+            </div>
+
+            <!-- MINI GAME -->
+            <div class="miniGame hidden" id="miniGame">
+              <div class="miniTitle">Собери сердце</div>
+              <div class="miniText">Перетащи 3 части в центр — и письмо “оживёт”.</div>
+              <div class="pieces">
+                <div class="piece p1" data-piece="1"></div>
+                <div class="piece p2" data-piece="2"></div>
+                <div class="piece p3" data-piece="3"></div>
+              </div>
+              <div class="dropZone" id="dropZone">
+                <div class="dropGlow"></div>
+                <div class="dropText">сюда</div>
+              </div>
+            </div>
+
+            <!-- HOLD -->
+            <div class="holdReveal hidden" id="holdReveal">
+              <div class="holdTitle">Последняя строка…</div>
+              <div class="holdText">Нажми и держи 2 секунды</div>
+              <button class="holdBtn" id="holdBtn" aria-label="hold">
+                <span class="holdFill" id="holdFill"></span>
+                <span class="holdLabel">держать</span>
+              </button>
+            </div>
+
+            <!-- FINAL -->
+            <div class="final hidden" id="final">
+              <div class="finalBigWrap">
+                <div class="finalBig print" id="finalPrint">Я тебя люблю 💖</div>
+                <div class="finalBig hand" id="finalHand">Я тебя люблю 💖</div>
+              </div>
+
+              <div class="finalSmall" id="finalSmall">И буду выбирать тебя каждый день.</div>
+
+              <div class="emotionLine hidden" id="emotionLine">
+                И даже если время остановится — я всё равно выберу тебя.
+              </div>
+
+              <div class="starHint" id="starHint">
+                ⭐ Найди нашу звезду в небе (справа сверху)…
+              </div>
+
+              <div class="heartZone">
+                <button class="heartBtn" id="heartBtn" aria-label="heart">
+                  <span class="heartGlow"></span>
+                  <span class="heartIcon">💗</span>
+                </button>
+                <div class="heartHint" id="heartHint">Нажимай на сердце…</div>
+              </div>
+
+              <div class="photosTitle">Сначала — ты ✨</div>
+              <div class="photoTable" id="photoTable"></div>
+
+              <div class="photosTitle">А потом — мы 📸</div>
+              <div class="photoTable" id="photoTableUs"></div>
+
+              <div class="actions">
+                <button class="btn" id="confettiBtn">Ещё конфетти 🎉</button>
+                <button class="btn ghost" id="restartBtn">Перечитать 💌</button>
+              </div>
+
+              <div class="bottomSecret hidden" id="bottomSecret">
+                …и если ты это читаешь — значит, ты дошла до самого конца 🤍
+              </div>
+            </div>
+
+          </div>
+
+          <div class="letterFooter">
+            <span class="signature" id="signature">— от того, кто о тебе думает ✨</span>
+            <span class="secretBadge hidden" id="secretBadge">Секрет открыт 🤫</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Secret modal -->
+    <div class="modal hidden" id="modal">
+      <div class="modalCard">
+        <div class="modalTitle" id="modalTitle">🤫 Секрет</div>
+        <div class="modalText" id="modalText"></div>
+        <button class="btn" id="modalClose">окей</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
